@@ -1,6 +1,10 @@
 from typing import List, Optional
-from fastapi import APIRouter, Body, Path, Query
+from fastapi import APIRouter, Body, Depends, Path, Query
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from controllers.models.user_model import UserBase, UserDisplay
+from db.database import get_db
+from db.repositories import db_user
 
 router = APIRouter(
     prefix='/user',
@@ -50,3 +54,22 @@ def create_blog(blog: BaseModel, id: int, version: int = 1):
     'version': version
     }
  
+ # Read all users
+@router.get('/', response_model=List[UserDisplay])
+def get_all_users(db: Session = Depends(get_db)):
+  return db_user.get_all_users(db)
+
+# Read one user
+@router.get('/{id}', response_model=UserDisplay)
+def get_user(id: int, db: Session = Depends(get_db)):
+  return db_user.get_user(db, id)
+
+# Update user
+@router.post('/{id}/update')
+def update_user(id: int, request: UserBase, db: Session = Depends(get_db)):
+  return db_user.update_user(db, id, request)
+
+# Delete user
+@router.get('/delete/{id}')
+def delete(id: int, db: Session = Depends(get_db)):
+  return db_user.delete_user(db, id)
