@@ -32,7 +32,7 @@ def create_comment(blog: BlogModel, id: int,
         content: str = Body(...,    # .../Ellipsis means the value is required for this param
             min_length=10,
             max_length=50,
-            regex='^[a-z]*$'
+            pattern='^[a-z]*$'
         ),
         v: Optional[List[str]] = Query(['1.0', '1.1', '1.2']),
         comment_id: int = Path(le=5)
